@@ -1,0 +1,57 @@
+package main
+
+import "fmt"
+
+
+templ Page(paymentMethods []PaymentMethod) {
+	<html>
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>Creative Portal</title>
+			// htmx
+			<script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"/>
+			// alpine.js
+			<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.7/dist/cdn.min.js"></script>
+		</head>
+		<body class="bg-gray-100">
+			<div class="hero-body">
+					<div class="container">
+						{ children... }
+            @paymentMethodList(paymentMethods)
+					</div>
+				</div>
+		</body>
+	</html>
+}
+
+templ paymentMethodList(paymentMethods []PaymentMethod) {
+  <ul>
+  for _, item := range paymentMethods {
+    <li hx-target="this" hx-swap="outerHTML">Id: { item.Id }, name: {item.Name}
+     <button hx-get={ string(templ.URL(fmt.Sprintf("/payment-methods/%s/edit", item.Id)))}>
+    Click Me
+  </button>
+
+    </li>
+
+  }
+  </ul>
+}
+
+templ methodItem (paymentMethod PaymentMethod) {
+      <li hx-target="this" hx-swap="outerHTML">Id: { paymentMethod.Id }, name: {paymentMethod.Name}
+     <button hx-post={ string(templ.URL(fmt.Sprintf("/payment-methods/%s/edit", paymentMethod.Id)))}>
+    Click Me
+  </button>
+      </li>
+
+}
+
+
+templ form(id string) {
+  <form hx-post={ string(templ.URL(fmt.Sprintf("/payment-methods/%s", id)))} hx-target="this" hx-swap="outerHTML">
+  <input type="text" name="paymentMethodName"></input>
+   <button type="submit" class="btn">Submit</button>
+  </form>
+}
